@@ -97,7 +97,6 @@
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormOpen";
             this.Text = "Выбор товаров";
-            this.Load += new System.EventHandler(this.FormOpen_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);

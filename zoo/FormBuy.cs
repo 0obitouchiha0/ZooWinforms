@@ -15,43 +15,34 @@ namespace zoo
 {
     public partial class FormBuy : Form
     {
+        DB db;
+        Random random = new Random();
+        int price;
+        int discount;
+        string description;
+        string name;
+        string producer;
 
-        private decimal price;
-        private decimal discount;
-        private Random random = new Random();
-
-        private string description;
-        private string name;
-        private string manufacturer;
-
-        public FormBuy(string description, string name, string manufacturer, decimal price, decimal discount, NpgsqlConnection connection)
+        public FormBuy(string description, string name, string producer, int price, int discount)
         {
             InitializeComponent();
-
-            // Сохраняем переданные данные в полях класса
+            db = new DB("Server=localhost;Port=5432;Database=zoo;Username=postgres;Password=postgres;");
             this.description = description;
             this.name = name;
-            this.manufacturer = manufacturer;
-            conn = connection;
-
-            // Передаем данные в richTextBoxDetails
-            richTextBox1.Text = $"Описание товара: {this.description}\n" +
-                                $"Наименование товара: {this.name}\n" +
-                                $"Производитель: {this.manufacturer}\n" +
-                                $"Цена: {price:C}\n" +
-                                $"Размер скидки: {discount}\n" +
-                                $"Дата заказа: {DateTime.Now:dd/MM/yyyy} \n" +
-                                $"Номер заказа: {GenerateOrderNumber()}\n" +
-                                $"Пункт выдачи:  {comboBox1.SelectedItem} \n" +
-                                $"Код получение: {GenerateRandomCode()}\n";
-
-            numericUpDown1.Value = 1;
+            this.producer = producer;
             this.price = price;
             this.discount = discount;
 
-            comboBox1.Items.Add("Пункт 1");
-            comboBox1.Items.Add("Пункт 2");
-            comboBox1.Items.Add("Пункт 3");
+            richTextBox1.Text = $"Описание товара: {this.description}\n" +
+                                $"Наименование товара: {this.name}\n" +
+                                $"Производитель: {this.producer}\n" +
+                                $"Цена: {price:C}\n" +
+                                $"Размер скидки: {discount}\n" +
+                                $"Дата заказа: {DateTime.Now:dd/MM/yyyy} \n" +
+                                $"Номер заказа: {generateOrderNumber()}\n" +
+                                $"Пункт выдачи:  {comboBox1.SelectedItem} \n" +
+                                $"Код получение: {generateRandomCode()}\n";
+            numericUpDown1.Value = 1;
         }
 
         private void UpdateRichTextBox()
@@ -63,87 +54,59 @@ namespace zoo
                 MessageBox.Show("Заказ не может быть пустым.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 FormOpen formoOpen = new FormOpen();
                 formoOpen.Show();
-                this.Close();
+                Close();
             }
             else
             {
-                decimal totalAmount = (this.price * quantity) - this.discount;
+                decimal totalAmount = (price - discount) * quantity;
 
-                // Обновляем содержимое richTextBox1 на основе сохраненных данных
                 richTextBox1.Text = $"Описание товара: {this.description}\n" +
                                     $"Наименование товара: {this.name}\n" +
-                                    $"Производитель: {this.manufacturer}\n" +
+                                    $"Производитель: {this.producer}\n" +
                                     $"Цена: {totalAmount:C}\n" +
                                     $"Размер скидки: {this.discount}\n" +
                                     $"Дата заказа: {DateTime.Now:dd/MM/yyyy} \n" +
-                                    $"Номер заказа: {GenerateOrderNumber()}\n" +
+                                    $"Номер заказа: {generateOrderNumber()}\n" +
                                     $"Пункт выдачи:  {comboBox1.SelectedItem} \n" +
-                                    $"Код получение: {GenerateRandomCode()}\n";
+                                    $"Код получение: {generateRandomCode()}\n";
                 textBox1.Text = totalAmount.ToString();
             }
         }
-        private string GenerateOrderNumber()
+        private int generateOrderNumber()
         {
-            return DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            return random.Next(100, 9999);
         }
 
-        private string GenerateRandomCode()
+        private int generateRandomCode()
         {
-            // Генерация трех случайных цифр
-            return random.Next(100, 999).ToString();
-        }
-
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
-        {
-
+            return random.Next(100, 9999);
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            decimal quantity = numericUpDown1.Value;
-
             UpdateRichTextBox();
         }
-        private NpgsqlConnection conn;
         private void Buy_Click(object sender, EventArgs e)
         {
-            // Получаем значения из richTextBox1
-            string names = this.name;
-            decimal discount = this.discount;
-            decimal totalAmount = decimal.Parse(textBox1.Text); // Общая сумма заказа
-            string orderNumber = GenerateOrderNumber();
-            string pickupLocation = comboBox1.SelectedItem.ToString();
-            string retrievalCode = GenerateRandomCode();
-
-            // Сохраняем данные в базу данных
-            using (NpgsqlCommand cmd = new NpgsqlCommand())
+            try
             {
-                conn.Open();
-                cmd.Connection = conn;
+                int fullDiscount = discount * int.Parse(numericUpDown1.Value.ToString());
+                int sum = int.Parse(textBox1.Text);
+                int orderNumber = generateOrderNumber();
+                string point = comboBox1.SelectedItem.ToString();
+                int code = generateRandomCode();
 
-                // Запрос для вставки данных в таблицу orderuser
-                string sql = "INSERT INTO orderuser (дата_заказа, номер_заказа, название_товара, сумма_заказа, сумма_скидки, пункт_выдачи, код_получения) " +
-                             "VALUES (@OrderDate, @OrderNumber, @names, @TotalAmount, @discount, @PickupLocation, @RetrievalCode)";
-
-                cmd.CommandText = sql;
-
-                // Параметры запроса
-                cmd.Parameters.Add(new NpgsqlParameter("@OrderDate", NpgsqlDbType.Date)).Value = DateTime.Now.Date;
-                cmd.Parameters.AddWithValue("@OrderNumber", long.Parse(orderNumber));
-                cmd.Parameters.AddWithValue("@names", names); // Предполагается, что название товара берется из поля name
-                cmd.Parameters.AddWithValue("@TotalAmount", totalAmount);
-                cmd.Parameters.AddWithValue("@discount", discount);
-                cmd.Parameters.AddWithValue("@PickupLocation", pickupLocation);
-                cmd.Parameters.AddWithValue("@RetrievalCode", int.Parse(retrievalCode));
-
-                // Выполняем запрос
-                cmd.ExecuteNonQuery();
+                db.addOrder(DateTime.Now, orderNumber, name, sum, fullDiscount, point, code);
 
                 MessageBox.Show("Заказ успешно оформлен и сохранен в базе данных.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Ошибка при добавлении данных: " + ex.Message);
+            }
         }
 
-        private void Refresh_Click(object sender, EventArgs e)
+        private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
             UpdateRichTextBox();
         }

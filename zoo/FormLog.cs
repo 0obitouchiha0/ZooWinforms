@@ -13,52 +13,44 @@ namespace zoo
 {
     public partial class FormLog : Form
     {
+        DB db;
         public FormLog()
         {
             InitializeComponent();
-
-        }
-        NpgsqlConnection conn = new NpgsqlConnection("Server=localhost;Port=5432;Database=database;Username=postgres;Password=0000;");
-        private void but_login(object sender, EventArgs e)
-        {
-            bool blnfound = false;
-            try
-            {
-                conn.Open();
-
-                NpgsqlCommand npgsql = new NpgsqlCommand("Select * from users where username ='" + logintext.Text + "'and pass='" + passtext.Text + "'", conn);
-                NpgsqlDataReader dr = npgsql.ExecuteReader();
-
-                if (dr.Read())
-                {
-                    blnfound = true;
-                    this.Hide();
-                    FormOpen formOpen = new FormOpen();
-                    formOpen.ShowDialog();
-                }
-                else if (blnfound == false)
-                {
-                    MessageBox.Show("Неправильно введены данные");
-                }
-                dr.Close();
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ошибка " + ex.Message, "");
-                conn.Close();
-            }
-        }
-
-        private void but_visit(object sender, EventArgs e)
-        {
-            this.Hide();
-            FormOpen frmOpen = new FormOpen();
-            frmOpen.ShowDialog();
+            db = new DB("Server=localhost;Port=5432;Database=zoo;Username=postgres;Password=postgres;");
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+        }
+
+        private void loginBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int result = db.login(logintext.Text, passtext.Text);
+                if (result > 0)
+                {
+                    Hide();
+                    FormOrders formOrders = new FormOrders();
+                    formOrders.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("Неправильно введены данные");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка " + ex.Message);
+            }
+        }
+
+        private void visitBtn_Click(object sender, EventArgs e)
+        {
+            Hide();
+            FormOpen formOpen = new FormOpen();
+            formOpen.ShowDialog();
         }
     }
 }

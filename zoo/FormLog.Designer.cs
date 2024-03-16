@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.loginBtn = new System.Windows.Forms.Button();
+            this.visitBtn = new System.Windows.Forms.Button();
             this.logintext = new System.Windows.Forms.TextBox();
             this.passtext = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -37,25 +37,25 @@
             this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // button1
+            // loginBtn
             // 
-            this.button1.Location = new System.Drawing.Point(61, 185);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(158, 44);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Войти";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.but_login);
+            this.loginBtn.Location = new System.Drawing.Point(61, 185);
+            this.loginBtn.Name = "loginBtn";
+            this.loginBtn.Size = new System.Drawing.Size(158, 44);
+            this.loginBtn.TabIndex = 0;
+            this.loginBtn.Text = "Войти";
+            this.loginBtn.UseVisualStyleBackColor = true;
+            this.loginBtn.Click += new System.EventHandler(this.loginBtn_Click);
             // 
-            // button2
+            // visitBtn
             // 
-            this.button2.Location = new System.Drawing.Point(61, 251);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(158, 42);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Я гость";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.but_visit);
+            this.visitBtn.Location = new System.Drawing.Point(61, 251);
+            this.visitBtn.Name = "visitBtn";
+            this.visitBtn.Size = new System.Drawing.Size(158, 42);
+            this.visitBtn.TabIndex = 1;
+            this.visitBtn.Text = "Я гость";
+            this.visitBtn.UseVisualStyleBackColor = true;
+            this.visitBtn.Click += new System.EventHandler(this.visitBtn_Click);
             // 
             // logintext
             // 
@@ -102,7 +102,7 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Войдите в систему";
             // 
-            // Form1
+            // FormLog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -112,9 +112,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.passtext);
             this.Controls.Add(this.logintext);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Name = "Form1";
+            this.Controls.Add(this.visitBtn);
+            this.Controls.Add(this.loginBtn);
+            this.Name = "FormLog";
             this.Text = "Вход";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
@@ -124,8 +124,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button loginBtn;
+        private System.Windows.Forms.Button visitBtn;
         private System.Windows.Forms.TextBox logintext;
         private System.Windows.Forms.TextBox passtext;
         private System.Windows.Forms.Label label1;
